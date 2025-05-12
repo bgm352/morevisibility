@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pharma_ai_visibility"
+version = "0.1.0"
+description = "Strategic AI Visibility Intelligence Platform for Pharmaceutical Brands"
+readme = "README.md"
+requires-python = ">=3.8"
+
+dependencies = [
+    "streamlit>=1.34.0",
+    "pandas>=2.2.1",
+    "plotly>=5.20.0",
+    "numpy>=1.26.4",
+    "seaborn>=0.12.2",
+    "matplotlib>=3.7.1"
+]
+
+[project.scripts]
+pharma-ai-visibility = "pharma_ai_visibility.app:main"
+generate-mock-data = "pharma_ai_visibility.mock_data_generator:main"
+analyze-visibility = "pharma_ai_visibility.data_analysis:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "mypy",
+    "black"
+]
+
+[tool.setuptools]
+packages = ["pharma_ai_visibility"]
