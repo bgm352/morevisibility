@@ -1,0 +1,13 @@
+[server]
+port = 8501
+maxUploadSize = 1028
+
+[runner]
+magicEnabled = true
+installTracker = true
+
+[logger]
+level = "info"
+
+[client]
+showErrorDetails = true
