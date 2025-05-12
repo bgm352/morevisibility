@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='pharma-ai-visibility-intelligence',
+    name='pharma_ai_visibility',
     version='0.1.0',
     description='Strategic AI Visibility Intelligence Platform for Pharmaceutical Brands',
     long_description=open('README.md').read(),
@@ -9,6 +9,7 @@ setup(
     author='AI Visibility Intelligence Team',
     author_email='contact@pharma-ai-intelligence.com',
     packages=find_packages(),
+    include_package_data=True,
     install_requires=[
         'streamlit>=1.34.0',
         'pandas>=2.2.1',
@@ -29,9 +30,12 @@ setup(
     python_requires='>=3.8',
     entry_points={
         'console_scripts': [
-            'pharma-ai-visibility=app:main',
-            'generate-mock-data=mock_data_generator:main',
-            'analyze-visibility=data_analysis:main'
+            'pharma-ai-visibility=pharma_ai_visibility.app:main',
+            'generate-mock-data=pharma_ai_visibility.mock_data_generator:main',
+            'analyze-visibility=pharma_ai_visibility.data_analysis:main'
         ]
+    },
+    package_data={
+        'pharma_ai_visibility': ['data/*'],
     }
 )
