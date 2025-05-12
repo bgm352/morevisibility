@@ -2,91 +2,98 @@ import streamlit as st
 import sys
 import os
 
-# Add project root to Python path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Ensure the current directory is in the Python path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.dirname(current_dir))
 
-from pharma_ai_visibility.mock_data_generator import PharmaAIMockDataGenerator
-from pharma_ai_visibility.data_analysis import PharmaAIVisibilityAnalysis
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objs as go
+import numpy as np
 
-def ensure_data_exists():
-    """Ensure mock data is generated"""
-    data_dir = 'data'
-    os.makedirs(data_dir, exist_ok=True)
-    data_file = os.path.join(data_dir, 'pharma_ai_visibility_mock_data.csv')
+# Mock data generation (simplified for deployment)
+def generate_mock_data():
+    """Generate a simplified mock dataset for pharma AI visibility"""
+    np.random.seed(42)
+    brands = ['Pfizer', 'Moderna', 'Johnson & Johnson', 'AstraZeneca']
+    platforms = ['ChatGPT', 'Microsoft Copilot', 'Google Gemini']
     
-    if not os.path.exists(data_file):
-        generator = PharmaAIMockDataGenerator()
-        generator.save_mock_data(data_dir)
+    data = []
+    for _ in range(50):  # Generate 50 data points
+        brand = np.random.choice(brands)
+        platform = np.random.choice(platforms)
+        
+        data.append({
+            'Brand': brand,
+            'Platform': platform,
+            'Visibility_Score': np.random.uniform(20, 80),
+            'Sentiment_Score': np.random.uniform(-1, 1),
+            'Innovation_Mentions': np.random.randint(1, 10)
+        })
+    
+    return pd.DataFrame(data)
 
 def main():
-    # Ensure data is generated before running the app
-    ensure_data_exists()
-    
-    # Set page configuration
+    # Page configuration
     st.set_page_config(
         page_title="Pharma AI Visibility Intelligence", 
         page_icon="💊",
         layout="wide"
     )
     
-    # Title and Introduction
-    st.markdown("""
-    # 🧬 Pharmaceutical AI Visibility Intelligence
-    ## Strategic Insights for Market Leadership
-    """)
+    # Title
+    st.title("🧬 Pharmaceutical AI Visibility Intelligence")
     
-    # Initialize Analyzer
+    # Generate mock data
     try:
-        analyzer = PharmaAIVisibilityAnalysis()
+        data = generate_mock_data()
     except Exception as e:
-        st.error(f"Error initializing analyzer: {e}")
+        st.error(f"Error generating mock data: {e}")
         return
     
-    # Strategic Insights Section
-    st.header("🔍 Strategic Insights")
-    try:
-        insights = analyzer.export_insights_report()
-        
-        # Display key insights
-        for key, value in insights['Overall_Insights'].items():
-            st.markdown(f"### {key.replace('_', ' ')}")
-            st.write(str(value))
-    except Exception as e:
-        st.error(f"Error generating insights: {e}")
+    # Visualization Sections
+    st.header("Brand Visibility Analysis")
     
-    # Visualizations
-    st.header("🌐 Comprehensive Performance Metrics")
+    # Visibility Score by Brand
+    fig1 = px.box(
+        data, 
+        x='Brand', 
+        y='Visibility_Score', 
+        title='Visibility Score Distribution'
+    )
+    st.plotly_chart(fig1, use_container_width=True)
     
-    # Try to generate and display visualizations
-    try:
-        # Generate visualizations
-        analyzer.generate_advanced_visualization()
-        
-        # Display the generated image
-        st.image('data/pharma_ai_visibility_analysis.png', 
-                 caption='Comprehensive Pharma AI Visibility Analysis')
-    except Exception as e:
-        st.error(f"Error generating visualizations: {e}")
+    # Sentiment Analysis
+    fig2 = px.scatter(
+        data, 
+        x='Visibility_Score', 
+        y='Sentiment_Score', 
+        color='Brand',
+        title='Visibility vs Sentiment',
+        labels={'Visibility_Score': 'Visibility', 'Sentiment_Score': 'Sentiment'}
+    )
+    st.plotly_chart(fig2, use_container_width=True)
     
-    # Data Exploration
-    if st.checkbox("Explore Detailed Dataset"):
-        st.dataframe(analyzer.data)
+    # Platform Comparison
+    platform_performance = data.groupby('Platform')['Visibility_Score'].mean()
+    fig3 = px.bar(
+        x=platform_performance.index, 
+        y=platform_performance.values,
+        title='Average Visibility by Platform',
+        labels={'x': 'Platform', 'y': 'Average Visibility Score'}
+    )
+    st.plotly_chart(fig3, use_container_width=True)
     
-    # Methodology and Value Proposition
-    st.markdown("""
-    ## 💡 Why AI Visibility Matters
+    # Key Insights
+    st.header("Key Insights")
     
-    ### For Pharmaceutical Decision Makers
-    - **Strategic Positioning**: Understand your brand's AI presence
-    - **Competitive Intelligence**: Track industry visibility trends
-    - **Innovation Tracking**: Monitor knowledge dissemination
-    - **Sentiment Analysis**: Gauge brand perception
+    # Top performing brand
+    top_brand = data.groupby('Brand')['Visibility_Score'].mean().idxmax()
+    st.metric("Top Performing Brand", top_brand)
     
-    ### Methodology
-    - Mock data simulates real-world AI visibility scenarios
-    - Multi-platform performance tracking
-    - Advanced visibility and sentiment metrics
-    """)
+    # Data Table
+    st.header("Raw Data")
+    st.dataframe(data)
 
 if __name__ == "__main__":
     main()
